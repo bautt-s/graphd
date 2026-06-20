@@ -1,0 +1,238 @@
+@import 'tailwindcss';
+
+/* =========================================================================
+   Graphd — "Estación Pro · Surface Studio" (Opción C)
+   Steel / beveled dark blue-gray chrome, IBM Plex Mono, orange accent.
+   ========================================================================= */
+@theme {
+  --color-app-bg: #1b212b; /* window base */
+  --color-app-panel: #1f2530; /* sidebar / inspector */
+  --color-app-panel-2: #222a36; /* group box / hover */
+  --color-app-viewport: #11161e; /* 3D viewport */
+  --color-app-input: #171c24; /* inset inputs */
+  --color-app-border: #11151c; /* dark bevel border */
+  --color-app-border-soft: #2a3340;
+  --color-app-text: #dfe7f2;
+  --color-app-muted: #8a98ad;
+  --color-app-faint: #6f7d92;
+  --color-app-accent: #ffb14d; /* orange CTA / active */
+  --color-app-accent-soft: #ffc870;
+  --color-app-blue: #3f5f94; /* selection / slider fill */
+  --color-app-blue-soft: #6f8fc4;
+  --color-app-danger: #ff5a78;
+  --color-app-ok: #7ad151;
+
+  --font-sans: 'IBM Plex Mono', ui-monospace, 'JetBrains Mono', Consolas, monospace;
+  --font-mono: 'IBM Plex Mono', ui-monospace, Consolas, monospace;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+  margin: 0;
+}
+
+body {
+  background: var(--color-app-bg);
+  color: var(--color-app-text);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  overflow: hidden;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+/* Thin custom scrollbars for the panels */
+.gd-scroll {
+  scrollbar-width: thin;
+  scrollbar-color: var(--color-app-border-soft) transparent;
+}
+.gd-scroll::-webkit-scrollbar {
+  width: 9px;
+  height: 9px;
+}
+.gd-scroll::-webkit-scrollbar-thumb {
+  background: var(--color-app-border-soft);
+  border-radius: 2px;
+  border: 2px solid var(--color-app-panel);
+}
+.gd-scroll::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+/* ---- Beveled "Pro" chrome utilities ------------------------------------ */
+.gd-titlebar {
+  background: linear-gradient(#3a4658, #252d3a);
+  border-bottom: 1px solid var(--color-app-border);
+}
+.gd-winbtn {
+  width: 18px;
+  height: 14px;
+  border: 1px solid var(--color-app-border);
+  font-size: 9px;
+  line-height: 13px;
+  text-align: center;
+  color: #aab6c8;
+  background: linear-gradient(#404c5e, #2c3543);
+}
+.gd-winbtn-close {
+  background: linear-gradient(#b5503c, #8a3322);
+  color: #ffd9d0;
+}
+.gd-menubar {
+  background: var(--color-app-panel-2);
+  border-bottom: 1px solid var(--color-app-border);
+}
+.gd-toolbar {
+  background: linear-gradient(#2e3744, #252d39);
+  border-bottom: 1px solid var(--color-app-border);
+}
+.gd-tool {
+  width: 28px;
+  height: 24px;
+  border-radius: 3px;
+  background: linear-gradient(#3c4859, #2a3340);
+  border: 1px solid var(--color-app-border);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08);
+  color: #aebbd0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  font-size: 13px;
+}
+.gd-tool:hover {
+  background: linear-gradient(#475468, #333d4d);
+}
+.gd-tool[data-active='true'] {
+  color: var(--color-app-accent);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08), inset 0 0 0 1px rgba(255, 177, 77, 0.4);
+}
+.gd-bevel {
+  border-radius: 4px;
+  border: 1px solid var(--color-app-border);
+  background: linear-gradient(#4a5870, #333d4d);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.12);
+  color: var(--color-app-text);
+}
+.gd-bevel:hover {
+  background: linear-gradient(#566580, #3a4556);
+}
+.gd-primary {
+  border-radius: 4px;
+  border: 1px solid var(--color-app-border);
+  background: linear-gradient(#ffc870, #e08a1e 55%, #cc7714);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.45), 0 1px 2px rgba(0, 0, 0, 0.4);
+  color: #3a2400;
+  font-weight: 700;
+}
+.gd-primary:hover {
+  background: linear-gradient(#ffd488, #e8951f 55%, #d67f16);
+}
+.gd-group {
+  border: 1px solid var(--color-app-border);
+  border-radius: 4px;
+  background: var(--color-app-panel-2);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.05);
+}
+.gd-group > legend {
+  font-size: 11px;
+  color: #9fb0c8;
+  padding: 0 5px;
+}
+.gd-seclabel {
+  font-size: 10px;
+  letter-spacing: 0.12em;
+  color: var(--color-app-faint);
+  background: linear-gradient(#2a3340, #222a36);
+  border: 1px solid var(--color-app-border);
+  padding: 4px 8px;
+  border-radius: 3px;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.06);
+}
+.gd-statusbar {
+  background: linear-gradient(#252d39, #1d242e);
+  border-top: 1px solid var(--color-app-border);
+}
+.gd-layer-sel {
+  background: linear-gradient(#34507a, #27406a);
+  border-color: var(--color-app-border) !important;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.12);
+}
+.gd-input {
+  border-radius: 3px;
+  border: 1px solid var(--color-app-border);
+  background: var(--color-app-input);
+  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.4);
+  color: var(--color-app-text);
+  outline: none;
+}
+.gd-input:focus {
+  border-color: var(--color-app-accent);
+}
+
+/* ---- Range sliders: blue fill + steel rectangular knob ------------------ */
+input[type='range'].gd-range {
+  -webkit-appearance: none;
+  appearance: none;
+  height: 8px;
+  border-radius: 4px;
+  background: var(--color-app-input);
+  border: 1px solid var(--color-app-border);
+  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.5);
+  outline: none;
+}
+input[type='range'].gd-range::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 13px;
+  height: 15px;
+  margin-top: -4px;
+  border-radius: 2px;
+  background: linear-gradient(#cdd9ec, #9aa7bb);
+  border: 1px solid var(--color-app-border);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+  cursor: pointer;
+}
+input[type='range'].gd-range::-moz-range-thumb {
+  width: 13px;
+  height: 15px;
+  border-radius: 2px;
+  background: linear-gradient(#cdd9ec, #9aa7bb);
+  border: 1px solid var(--color-app-border);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+  cursor: pointer;
+}
+
+/* ---- MathLive field, themed to the steel inspector --------------------- */
+math-field {
+  --primary: var(--color-app-accent);
+  --selection-background-color: rgba(255, 177, 77, 0.25);
+  --caret-color: var(--color-app-accent);
+  font-size: 1rem;
+  font-style: italic;
+  color: #ffd9a3;
+  background: var(--color-app-input);
+  border: 1px solid var(--color-app-border);
+  border-radius: 3px;
+  padding: 6px 9px;
+  width: 100%;
+  outline: none;
+  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.4);
+}
+math-field:focus-within {
+  border-color: var(--color-app-accent);
+  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.4), 0 0 0 2px rgba(255, 177, 77, 0.2);
+}
+math-field::part(virtual-keyboard-toggle),
+math-field::part(menu-toggle) {
+  color: var(--color-app-muted);
+}
+.gd-mathhost[data-invalid='true'] math-field {
+  border-color: var(--color-app-danger);
+  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.4), 0 0 0 2px rgba(255, 90, 120, 0.25);
+}
