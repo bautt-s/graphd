@@ -12,8 +12,8 @@ export function ExportPanel() {
   const [scale, setScale] = useState(2)
   const [transparent, setTransparent] = useState(false)
   const [animFormat, setAnimFormat] = useState<'gif' | 'webm'>('gif')
-  const [duration, setDuration] = useState(4)
-  const [fps, setFps] = useState(20)
+  const [duration, setDuration] = useState(6)
+  const [fps, setFps] = useState(15)
   const [rotations, setRotations] = useState(1)
   const [progress, setProgress] = useState<number | null>(null)
   const [shareMsg, setShareMsg] = useState('')
@@ -105,14 +105,17 @@ export function ExportPanel() {
           />
         </Row>
         <Row label={`Duración ${duration}s`}>
-          <Slider value={duration} min={2} max={10} step={1} onChange={(v) => setDuration(Math.round(v))} />
+          <Slider value={duration} min={2} max={20} step={1} onChange={(v) => setDuration(Math.round(v))} />
         </Row>
         <Row label={`FPS ${fps}`}>
           <Slider value={fps} min={10} max={30} step={1} onChange={(v) => setFps(Math.round(v))} />
         </Row>
-        <Row label={`Velocidad ${rotations} vuelta${rotations === 1 ? '' : 's'}`}>
-          <Slider value={rotations} min={0.5} max={4} step={0.5} onChange={setRotations} />
+        <Row label={`Giro · ${rotations} vuelta${rotations === 1 ? '' : 's'}`}>
+          <Slider value={rotations} min={0.25} max={3} step={0.25} onChange={setRotations} />
         </Row>
+        <p className="text-[10px] leading-snug text-app-faint">
+          Más duración y menos vueltas = giro más lento.
+        </p>
         {busy && (
           <div className="h-1.5 w-full overflow-hidden rounded bg-app-panel-2">
             <div

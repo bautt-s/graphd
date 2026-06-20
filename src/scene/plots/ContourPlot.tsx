@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef } from 'react'
+import { useEffect, useMemo } from 'react'
 import { useThree } from '@react-three/fiber'
 import * as THREE from 'three'
 import { latexToBody } from '../../math/compile'
@@ -10,7 +10,6 @@ import { useSampler, type Quality } from './useSampler'
 export function ContourPlot({ obj }: { obj: ContourPlotT }) {
   const compiled = useMemo(() => latexToBody(obj.expr), [obj.expr])
   const fineRes = Math.min(obj.resolution, tier().maxSurfaceRes)
-  const geomRef = useRef<THREE.BufferGeometry>(null)
   const invalidate = useThree((s) => s.invalidate)
 
   const build = (q: Quality): SampleJob | null => {
@@ -42,18 +41,22 @@ export function ContourPlot({ obj }: { obj: ContourPlotT }) {
 
   const sample = result && result.kind === 'contour' ? (result as LineSetSample) : null
 
-  useEffect(() => {
-    const g = geomRef.current
-    if (!g || !sample) return
+  const geometry = useMemo(() => {
+    if (!sample) return null
+    const g = new THREE.BufferGeometry()
     g.setAttribute('position', new THREE.BufferAttribute(sample.positions, 3))
     g.computeBoundingSphere()
-    invalidate()
-  }, [sample, invalidate])
+    return g
+  }, [sample])
 
-  if (!sample) return null
+  useEffect(() => {
+    if (geometry) invalidate()
+    return () => geometry?.dispose()
+  }, [geometry, invalidate])
+
+  if (!geometry) return null
   return (
-    <lineSegments visible={obj.visible}>
-      <bufferGeometry ref={geomRef} />
+    <lineSegments geometry={geometry} visible={obj.visible}>
       <lineBasicMaterial
         color={obj.style.color}
         transparent={obj.style.opacity < 1}

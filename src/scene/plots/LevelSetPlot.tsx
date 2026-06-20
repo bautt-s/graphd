@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef } from 'react'
+import { useEffect, useMemo } from 'react'
 import { useThree } from '@react-three/fiber'
 import * as THREE from 'three'
 import { latexToBody } from '../../math/compile'
@@ -12,7 +12,6 @@ import { useSampler, type Quality } from './useSampler'
 export function LevelSetPlot({ obj }: { obj: LevelSetPlotT }) {
   const compiled = useMemo(() => latexToBody(obj.expr), [obj.expr])
   const fineRes = Math.min(obj.resolution, tier().maxLevelSetRes)
-  const geomRef = useRef<THREE.BufferGeometry>(null)
   const invalidate = useThree((s) => s.invalidate)
 
   const build = (q: Quality): SampleJob | null => {
@@ -46,9 +45,9 @@ export function LevelSetPlot({ obj }: { obj: LevelSetPlotT }) {
 
   const sample = result && result.kind === 'levelSet' ? (result as LineSetSample) : null
 
-  useEffect(() => {
-    const g = geomRef.current
-    if (!g || !sample || !sample.normals) return
+  const geometry = useMemo(() => {
+    if (!sample || !sample.normals) return null
+    const g = new THREE.BufferGeometry()
     g.setAttribute('position', new THREE.BufferAttribute(sample.positions, 3))
     g.setAttribute('normal', new THREE.BufferAttribute(sample.normals, 3))
     if (obj.style.colormap !== 'none') {
@@ -70,18 +69,20 @@ export function LevelSetPlot({ obj }: { obj: LevelSetPlotT }) {
         colors[i * 3 + 2] = b
       }
       g.setAttribute('color', new THREE.BufferAttribute(colors, 3))
-    } else {
-      g.deleteAttribute('color')
     }
     g.computeBoundingSphere()
-    invalidate()
-  }, [sample, obj.style.colormap, invalidate])
+    return g
+  }, [sample, obj.style.colormap])
 
-  if (!sample) return null
+  useEffect(() => {
+    if (geometry) invalidate()
+    return () => geometry?.dispose()
+  }, [geometry, invalidate])
+
+  if (!geometry) return null
   const mat = surfaceMaterialProps(obj.style)
   return (
-    <mesh visible={obj.visible}>
-      <bufferGeometry ref={geomRef} />
+    <mesh geometry={geometry} visible={obj.visible}>
       <meshStandardMaterial key={obj.style.colormap === 'none' ? 'flat' : 'vc'} {...mat} />
     </mesh>
   )

@@ -108,11 +108,18 @@ export function ExportController() {
 
     const exportGIF = async (opts: AnimOptions): Promise<Blob | null> => {
       const enc = GIFEncoder()
-      const delay = Math.round(1000 / opts.fps)
-      await animateFrames(opts, 0, (px) => {
-        const palette = quantize(px.data, 256)
+      const delay = Math.max(20, Math.round(1000 / opts.fps))
+      // One global palette (from the first frame) keeps colors stable across
+      // frames — per-frame palettes cause flicker.
+      let palette: number[][] | null = null
+      await animateFrames(opts, 0, (px, i) => {
+        if (i === 0 || !palette) palette = quantize(px.data, 256)
         const index = applyPalette(px.data, palette)
-        enc.writeFrame(index, px.width, px.height, { palette, delay })
+        if (i === 0) {
+          enc.writeFrame(index, px.width, px.height, { palette, delay, repeat: 0 })
+        } else {
+          enc.writeFrame(index, px.width, px.height, { delay })
+        }
       })
       enc.finish()
       return new Blob([enc.bytes() as BlobPart], { type: 'image/gif' })

@@ -3,7 +3,11 @@ declare module 'gifenc' {
     palette?: number[][]
     delay?: number
     transparent?: boolean
+    transparentIndex?: number
     dispose?: number
+    repeat?: number
+    first?: boolean
+    colorDepth?: number
   }
   export interface Encoder {
     writeFrame(index: Uint8Array, width: number, height: number, opts?: WriteFrameOpts): void

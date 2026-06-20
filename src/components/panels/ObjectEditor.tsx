@@ -4,7 +4,7 @@ import { validateLatex } from '../../math/compile'
 import { tier } from '../../lib/deviceTier'
 import type { PlotObject, Range } from '../../types'
 import { MathField } from '../mathinput/MathField'
-import { Button, NumberField, Row, Section, SelectField, Slider, Toggle } from '../ui/controls'
+import { NumberField, Row, Section, SelectField, Slider, Toggle } from '../ui/controls'
 import { StyleEditor } from './StyleEditor'
 
 function ExprField({
@@ -28,7 +28,6 @@ function ExprField({
 
 export function ObjectEditor({ obj }: { obj: PlotObject }) {
   const update = useStore((s) => s.updateObject)
-  const resetCamera = useStore((s) => s.resetCamera)
   const u = (patch: Record<string, unknown>) => update(obj.id, patch)
   const t = tier()
 
@@ -200,12 +199,6 @@ export function ObjectEditor({ obj }: { obj: PlotObject }) {
       </Section>
 
       <StyleEditor obj={obj} />
-
-      <div className="px-3 pb-4">
-        <Button variant="primary" full onClick={resetCamera}>
-          Aplicar y encuadrar
-        </Button>
-      </div>
     </div>
   )
 }

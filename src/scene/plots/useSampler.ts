@@ -26,6 +26,11 @@ export function useSampler(
     const pool = getPool()
     const my = ++token.current
     let cancelled = false
+    // Guards against the coarse pass landing after the fine pass and
+    // overwriting it with a lower-resolution (buggy-looking) result.
+    let fineApplied = false
+
+    const live = () => !cancelled && token.current === my
 
     const coarse = buildJob('coarse')
     if (!coarse) {
@@ -37,24 +42,25 @@ export function useSampler(
     pool
       .sample(coarse)
       .then((r) => {
-        if (!cancelled && token.current === my) {
-          setState((s) => ({ ...s, result: r }))
-        }
+        if (live() && !fineApplied) setState((s) => ({ ...s, result: r }))
       })
       .catch(() => {
-        if (!cancelled && token.current === my) setState({ result: null, busy: false })
+        if (live() && !fineApplied) setState((s) => ({ ...s, result: null, busy: false }))
       })
 
     const timer = setTimeout(() => {
       const fine = buildJob('fine')
-      if (!fine || cancelled || token.current !== my) return
+      if (!fine || !live()) return
       pool
         .sample(fine)
         .then((r) => {
-          if (!cancelled && token.current === my) setState({ result: r, busy: false })
+          if (live()) {
+            fineApplied = true
+            setState({ result: r, busy: false })
+          }
         })
         .catch(() => {
-          if (!cancelled && token.current === my) setState((s) => ({ ...s, busy: false }))
+          if (live()) setState((s) => ({ ...s, busy: false }))
         })
     }, IDLE_MS)
 
