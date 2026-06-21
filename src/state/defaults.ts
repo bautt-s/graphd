@@ -165,9 +165,23 @@ export function createObject(kind: PlotKind, colorIndex: number): PlotObject {
 }
 
 export function defaultGraph(): GraphState {
+  // Startup scene: a wireframe "egg-carton" terrain with a torus floating above.
+  const surface = createObject('surface', 0)
+  surface.label = 'Superficie'
+  if (surface.kind === 'surface') {
+    surface.expr = '\\sin(x)\\cos(y)'
+    surface.rangeU = r(-8, 8)
+    surface.rangeV = r(-8, 8)
+  }
+  surface.resolution = 60
+  surface.style = { ...surface.style, colormap: 'turbo', wireframe: true }
+
+  const torus = createObject('paramSurface', 1)
+  torus.resolution = 24
+
   return {
     version: SCHEMA_VERSION,
-    objects: [createObject('surface', 0)],
+    objects: [surface, torus],
     scene: defaultScene(),
     camera: defaultCamera(),
   }

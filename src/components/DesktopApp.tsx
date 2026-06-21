@@ -57,7 +57,7 @@ export function DesktopApp() {
       <div className="gd-titlebar flex h-8 shrink-0 items-center gap-2.5 px-2.5">
         <Logo size={17} className="text-app-accent" />
         <span className="text-xs font-semibold text-[#dfe7f2]">Graphd</span>
-        <span className="text-[11px] text-app-faint">v2.1 — Surface Studio</span>
+        <span className="text-[11px] text-app-faint">v1.1 — Surface Studio</span>
       </div>
 
       {/* ---- Toolbar ---- */}

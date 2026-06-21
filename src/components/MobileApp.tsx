@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useRef, useState } from 'react'
 import { useStore } from '../state/store'
 import { useTelemetry, useViewportBus } from '../state/viewport'
 import { GraphCanvas } from '../scene/GraphCanvas'
@@ -65,6 +65,45 @@ export function MobileApp() {
   const openTab = (t: Tab) => {
     setTab(t)
     setExpanded(true)
+  }
+
+  // ---- Bottom-sheet drag-to-resize (touch) ----
+  const COLLAPSED_H = 158
+  const EXPANDED_FRAC = 0.62
+  const drag = useRef<{ startY: number; baseH: number; moved: number } | null>(null)
+  const lastMoved = useRef(0)
+  const [dragH, setDragH] = useState<number | null>(null)
+
+  const onSheetTouchStart = (e: React.TouchEvent) => {
+    const baseH = expanded ? window.innerHeight * EXPANDED_FRAC : COLLAPSED_H
+    drag.current = { startY: e.touches[0].clientY, baseH, moved: 0 }
+    setDragH(baseH)
+  }
+  const onSheetTouchMove = (e: React.TouchEvent) => {
+    const d = drag.current
+    if (!d) return
+    const dy = e.touches[0].clientY - d.startY
+    d.moved = dy
+    const max = window.innerHeight * EXPANDED_FRAC
+    setDragH(Math.min(max, Math.max(COLLAPSED_H, d.baseH - dy)))
+  }
+  const onSheetTouchEnd = () => {
+    const d = drag.current
+    drag.current = null
+    setDragH(null)
+    if (!d) return
+    lastMoved.current = d.moved
+    const THRESHOLD = 48
+    if (d.moved < -THRESHOLD) setExpanded(true)
+    else if (d.moved > THRESHOLD) setExpanded(false)
+  }
+  const onGripClick = () => {
+    // Ignore the click synthesized at the end of a real swipe.
+    if (Math.abs(lastMoved.current) > 8) {
+      lastMoved.current = 0
+      return
+    }
+    setExpanded((v) => !v)
   }
 
   return (
@@ -153,21 +192,28 @@ export function MobileApp() {
       <div
         className="z-20 flex shrink-0 flex-col border-t border-app-border bg-app-panel"
         style={{
-          height: expanded ? '62vh' : '158px',
-          transition: 'height .25s ease',
+          height: dragH != null ? `${dragH}px` : expanded ? '62vh' : '158px',
+          transition: dragH != null ? 'none' : 'height .25s ease',
           borderRadius: '16px 16px 0 0',
           boxShadow: '0 -6px 18px rgba(0,0,0,.45)',
         }}
       >
-        <button
-          onClick={() => setExpanded((v) => !v)}
-          aria-label={expanded ? 'Contraer' : 'Expandir'}
-          className="flex shrink-0 justify-center py-2.5"
+        <div
+          onTouchStart={onSheetTouchStart}
+          onTouchMove={onSheetTouchMove}
+          onTouchEnd={onSheetTouchEnd}
+          style={{ touchAction: 'none' }}
+          className="shrink-0"
         >
-          <span className="h-1 w-10 rounded-full bg-[#4a5870]" />
-        </button>
+          <button
+            onClick={onGripClick}
+            aria-label={expanded ? 'Contraer' : 'Expandir'}
+            className="flex w-full shrink-0 justify-center py-2.5"
+          >
+            <span className="h-1 w-10 rounded-full bg-[#4a5870]" />
+          </button>
 
-        <div className="flex shrink-0 gap-1.5 border-b border-app-border px-3">
+          <div className="flex shrink-0 gap-1.5 border-b border-app-border px-3">
           {TABS.map((t) => (
             <button
               key={t.id}
@@ -181,6 +227,7 @@ export function MobileApp() {
               {t.label}
             </button>
           ))}
+          </div>
         </div>
 
         {!expanded ? (
