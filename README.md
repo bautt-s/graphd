@@ -1,3 +1,5 @@
+<img width="1600" height="735" alt="image" src="https://github.com/user-attachments/assets/875a202b-700f-434c-a2bd-57854fea3b22" />
+
 # Graphd
 
 Graficador 3D interactivo y altamente customizable para **Cálculo III / IV**.
@@ -58,5 +60,3 @@ npm run preview    # servir el build
 
 - El bundle es grande (~3.3 MB / 927 KB gzip) por Compute Engine + three; se puede
   reducir más adelante con *code-splitting* y carga diferida de CE.
-- Convención de ejes: math `(x, y, z)` → three `(x, z, y)` (la altura math-`z`
-  apunta hacia arriba).
